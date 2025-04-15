@@ -1,0 +1,89 @@
+<!-- daily_detail.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Daily Weather Detail</title>
+    <!-- Include any CSS files here -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .weather-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .weather-table th, .weather-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .weather-table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        .weather-icon {
+            width: 50px;
+        }
+    </style>
+    </style>
+</head>
+<body style="padding: 10px; margin-top: 30px; margin-bottom: 40px;">
+
+<h1>Weather Details for {{ city }} - {{ date }}</h1>
+<h2>City: {{ city|title }}</h2>
+{% if hourly_data %}
+<div class="container-fluid" style="padding: 10px; margin-top: 30px; margin-bottom: 40px;">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead  class="thead-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Temperature (°C)</th>
+                    <th>Feels Like (°C)</th>
+                    <th>Min Temperature (°C)</th>
+                    <th>Max Temperature (°C)</th>
+                    <th>Pressure</th>
+                    <th>Humidity</th>
+                    <th>Weather Description</th>
+                    <th>Wind Speed</th>
+                    <th>Visibility</th>
+                    <th>Icon</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in hourly_data %}
+                    <tr>
+                        <td>{{ data.dt_txt }}</td>
+                        <td>{{ data.main.temp }}°C</td>
+                        <td>{{ data.main.feels_like }}°C</td>
+                        <td>{{ data.main.temp_min }}°C</td>
+                        <td>{{ data.main.temp_max }}°C</td>
+                        <td>{{ data.main.pressure }} hPa</td>
+                        <td>{{ data.main.humidity }}%</td>
+                        <td>{{ data.weather.0.description|title }}</td>
+                        <td>{{ data.wind.speed }} m/s</td>
+                        <td>{{ data.visibility }} m</td>
+                        <td>
+                            <!-- Display weather icon -->
+                            <img class="weather-icon" src="http://openweathermap.org/img/wn/{{ data.weather.0.icon }}@2x.png" alt="{{ data.weather.0.description }}">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table></div>
+</div>
+{% else %}
+    <p>No hourly data available for this date.</p>
+{% endif %}
+<!-- Link to go back to the main page -->
+<p><a href="{% url 'weather:home' %}">Back to Home</a></p>
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

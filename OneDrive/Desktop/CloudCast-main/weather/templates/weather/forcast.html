@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{%static 'style.css' %}">
+    <title>Weather Alert</title>
+<style>
+form {
+	margin-bottom: 30px;
+}
+.search-wrapper {
+	width: 500px;
+	margin: auto;
+	margin-top: 50px;
+}
+form input {
+	padding: 5px;
+	border: 1px solid #ccc;
+  outline: 0;
+  border-radius: 15px;
+}
+
+form button{
+	background:#fff;
+	padding: 10px;
+	
+	margin-top: 10px;
+	font-size: 18px;
+	font-weight: bold;
+	box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+</style>
+  </head>
+  <body style="background: #fffef4;
+">
+
+
+
+	
+	<!-- Current Weather -->
+	<div id="current" class="wrapper">
+	
+		<form method="POST" >
+			{% csrf_token %}
+			<input type="text" name="city" placeholder="Enter city">
+			<button type="submit" >Get Weather</button>
+		</form>
+		{% if current_weather %}
+		<h1 class="location">{{ city|title}}</h1>
+		<h2 class="date">{{ current_weather.formatted_date}}</h2>
+		<p class="temp">{{ current_weather.main.temp }}°C</p>
+		
+		<img src="http://openweathermap.org/img/wn/{{ current_weather.weather.0.icon }}@2x.png" alt="{{ current_weather.weather.0.description }}">
+		<p class="conditions">{{current_weather.weather.0.description }}</p>
+	{% else %}
+		<p>No weather data available for today.</p>
+	{% endif %}
+
+	<!-- Future Forecast -->
+		<div class="container-fluid" style="background-color: #fff; margin-bottom: 30px; margin-top: 30px;">
+            <div class="row">
+				{% if daily_summary %}
+				{% for date, summary in daily_summary %}
+                <div class="col-md-2" >
+			
+					<div class="card" style="padding: 10px;"><a href="{% url 'weather:daily_detail_view' date %}">
+						<h6 class="day" style="font-weight: bold;">{{ summary.date }}</h6>
+						<div class="">
+							
+							<div class="mostlycloudy">
+								<div class="inner"><img src="http://openweathermap.org/img/wn/{{ summary.icon }}.png" alt="Weather icon"></div>
+							</div>
+						</div>
+					
+						<p class="conditions">{{summary.weather.0.description }}</p>
+						<p class="tempRange"><span class="high">{{ summary.temp_max }}</span> | <span class="low">{{ summary.temp_min }}</span></p>
+					</a> </div>
+                 
+                </div>
+				{% endfor %}
+				{% endif %}
+            </div>
+			
+		</div>
+		
+
+		{% if daily_summary and original_data %}
+        
+		 <!-- Chart.js canvas -->
+		 <div  class="chart-container" >
+            <canvas id="weatherChart"></canvas>
+        </div>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', (event) => {
+				// Prepare data for Chart.js
+				var labels = {{ labels|safe }};
+				var tempData = {{ temp_data|safe }};
+				var dailyLabels = {{ daily_labels|safe }};
+				var tempMinData = {{ temp_min_data|safe }};
+				var tempMaxData = {{ temp_max_data|safe }};
+		
+				// Check if data is available
+				if (labels.length && tempData.length) {
+					// Initialize Chart.js
+					var ctx = document.getElementById('weatherChart').getContext('2d');
+					var weatherChart = new Chart(ctx, {
+						type: 'line',
+						data: {
+							labels: labels,
+							datasets: [
+								{
+									label: 'Temperature (°C)',
+									data: tempData,
+									borderColor: 'rgba(75, 192, 192, 1)',
+									backgroundColor: 'rgba(75, 192, 192, 0.2)',
+									fill: false,
+									tension: 0.1
+								},
+								{
+									label: 'Min Temperature (Daily Summary) (°C)',
+									data: tempMinData,
+									borderColor: 'rgba(54, 162, 235, 1)',
+									backgroundColor: 'rgba(54, 162, 235, 0.2)',
+									fill: false,
+									tension: 0.1
+								},
+								{
+									label: 'Max Temperature (Daily Summary) (°C)',
+									data: tempMaxData,
+									borderColor: 'rgba(255, 99, 132, 1)',
+									backgroundColor: 'rgba(255, 99, 132, 0.2)',
+									fill: false,
+									tension: 0.1
+								}
+							]
+						},
+						options: {
+							responsive: true,
+							scales: {
+								x: {
+									type: 'category',
+									labels: labels, // Ensure this matches your labels format
+									title: {
+										display: true,
+										text: 'Date and Time'
+									}
+								},
+								y: {
+									beginAtZero: false,
+									title: {
+										display: true,
+										text: 'Temperature (°C)'
+									}
+								}
+							}
+						}
+					});
+				} else {
+					console.log('No data available to plot.');
+				}
+			});
+		</script>
+		
+    {% endif %}
+	<footer>
+		<p style="margin-top: 100px; background-color: #fff;"> <a href="">CloudCast</a> </p>
+	</footer>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </body>
+  
+</html>
