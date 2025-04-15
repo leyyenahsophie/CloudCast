@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{%static 'style.css' %}">
-    <title>Weather Alert</title>
+    <title>CloudCast</title>
 <style>
 form {
 	margin-bottom: 30px;
@@ -23,24 +23,25 @@ form {
 form input {
 	padding: 5px;
 	border: 1px solid #ccc;
-  outline: 0;
-  border-radius: 15px;
+    outline: 0;
+    border-radius: 15px;
 }
 
 form button{
-	background:#fff;
+	background:#a3b8cf; /* weather button color*/
 	padding: 10px;
-	
 	margin-top: 10px;
 	font-size: 18px;
 	font-weight: bold;
-	box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    font-family: 'Garamond', serif;
+    color:#163548e6;
+	box-shadow: rgba(18, 47, 87, 0.696) 0px 4px 12px; /* weather button shadow*/
 }
+
 
 </style>
   </head>
-  <body style="background: #fffef4;
-">
+  <body style="background: #c5deece6;"> <!-- Background color of main page -->
 
 
 
@@ -65,14 +66,14 @@ form button{
 	{% endif %}
 
 	<!-- Future Forecast -->
-		<div class="container-fluid" style="background-color: #fff; margin-bottom: 30px; margin-top: 30px;">
+		<div class="container-fluid" style="background-color: #c5deece6; margin-bottom: 30px; margin-top: 30px;"> <!-- Future Forecast side lines -->
             <div class="row">
 				{% if daily_summary %}
 				{% for date, summary in daily_summary %}
                 <div class="col-md-2" >
 			
 					<div class="card" style="padding: 10px;"><a href="{% url 'alert:daily_detail_view' date %}">
-						<h6 class="day" style="font-weight: bold;">{{ summary.date }}</h6>
+						<h6 class="day date" style="font-weight: bold;">{{ summary.date }}</h6>
 						<div class="">
 							
 							<div class="mostlycloudy">
@@ -172,7 +173,7 @@ form button{
 		
     {% endif %}
 	<footer>
-		<p style="margin-top: 100px; background-color: #fff;">By <a href=""></a> </p>
+		<p style="margin-top: 100px; background-color: #314159;"> <a href=""></a> </p> <!--footer button color -->
 	</footer>
 
     <!-- Optional JavaScript; choose one of the two! -->
