@@ -56,7 +56,7 @@
         <img src="http://openweathermap.org/img/wn/{{ current_weather.weather.0.icon }}@2x.png" alt="{{ current_weather.weather.0.description }}">
         <p class="conditions">{{ current_weather.weather.0.description }}</p>
       {% else %}
-        <p>No weather data available for today.</p>
+        <p>Search for the location you would like to check the weather for!</p>
       {% endif %}
 
       <!-- Future Forecast -->
@@ -65,7 +65,7 @@
           {% if daily_summary %}
           {% for date, summary in daily_summary %}
             <div class="col-md-2">
-              <div class="card" style="padding: 10px;">
+              <div class="card forecast-card" style="padding: 10px;">
                 <a href="{% url 'alert:daily_detail_view' date %}">
                   <h6 class="day date" style="font-weight: bold;">{{ summary.date }}</h6>
                   <div class="mostlycloudy">
@@ -75,7 +75,8 @@
                   </div>
                   <p class="conditions">{{ summary.weather.0.description }}</p>
                   <p class="tempRange">
-                    <span class="high">{{ summary.temp_max }}</span> | <span class="low">{{ summary.temp_min }}</span>
+                    <strong>High:</strong><span class="high">{{ summary.temp_max }}°C</span><br>
+                    <strong>Low:</strong><span class="low">{{ summary.temp_min }}°C</span>
                   </p>
                 </a>
               </div>
