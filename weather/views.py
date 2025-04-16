@@ -3,10 +3,13 @@ from datetime import datetime, date
 import requests
 from collections import defaultdict
 import json
-from django.http import JsonResponse
 import os
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_GET
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def weather_view(request):
     weather_data = None
@@ -101,7 +104,6 @@ def daily_detail_view(request, date):
     return render(request, 'weather/daily_detail.html', context)
 
 
-# Optional: a placeholder if you're still working on map integration
 def get_weather_by_coords(request):
     lat = request.GET.get('lat')
     lon = request.GET.get('lon')
@@ -109,44 +111,49 @@ def get_weather_by_coords(request):
     if not lat or not lon:
         return JsonResponse({'error': 'Missing coordinates'}, status=400)
 
-    # Get OpenWeatherMap API key from env
+    # Get API key from environment
     OPENWEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY")
     if not OPENWEATHER_API_KEY:
         return JsonResponse({'error': 'Missing OpenWeatherMap API key in environment'}, status=500)
 
     try:
         # Step 1: Reverse geocode to get city name
-        geo_url = (
-            f"http://api.openweathermap.org/geo/1.0/reverse"
-            f"?lat={lat}&lon={lon}&limit=1&appid={OPENWEATHER_API_KEY}"
-        )
+        geo_url = f"http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={OPENWEATHER_API_KEY}"
         geo_resp = requests.get(geo_url)
         geo_resp.raise_for_status()
         geo_data = geo_resp.json()
 
-        if not geo_data or 'name' not in geo_data[0]:
+        if not geo_data or not geo_data[0].get('name'):
             return JsonResponse({'error': 'City not found for coordinates'}, status=400)
 
         city = geo_data[0]['name']
         country = geo_data[0].get('country', '')
         city_query = f"{city},{country}" if country else city
 
-        # Step 2: Call your Azure cloudcast API using the city name
+        print(f"Clicked location {lat},{lon} resolved to {city_query}")
+
+
+        # Step 2: Use the Azure-hosted API (CloudCast) to get weather for the city
         azure_url = "https://cloudcast.azurewebsites.net/api/cloudcast"
+        azure_api_key = os.getenv("AZURE_FUNCTION_KEY")
+
         azure_response = requests.get(azure_url, params={
             'city': city_query,
-            'units': 'imperial'
+            'units': 'imperial',
+            'code': azure_api_key  # Add the API key here if required
         })
         azure_response.raise_for_status()
         weather_data = azure_response.json()
 
-        # Grab first result from Azure data
         current = weather_data['list'][0]
+
         return JsonResponse({
             'city': city,
             'temp': current['main']['temp'],
             'description': current['weather'][0]['description']
         })
+    
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
