@@ -67,6 +67,7 @@
       {% for date, summary in daily_summary %}
         <div class="col-md-2">
           <div class="card forecast-card" style="padding: 10px;">
+            <!-- <a href="{% url 'alert:daily_detail_view' date %}"> -->
             <a href="{% url 'alert:daily_detail_view' date %}">
               <h6 class="day date" style="font-weight: bold;">{{ summary.date }}</h6>
               <div class="mostlycloudy">

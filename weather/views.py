@@ -2,6 +2,7 @@ from django.shortcuts import render
 from datetime import datetime, date
 import requests
 from collections import defaultdict
+import json
 from django.http import JsonResponse
 import os
 from django.http import JsonResponse, Http404
@@ -59,18 +60,21 @@ def weather_view(request):
     temp_min_data = [summary['temp_min'] for summary in daily_summary.values()]
     temp_max_data = [summary['temp_max'] for summary in daily_summary.values()]
 
+    
+
     return render(request, 'weather/forcast.html', {
-        'current_weather': current_weather,
-        'weather_data': weather_data,
-        'daily_summary': sorted(daily_summary.items()),
-        'original_data': original_data,
-        'city': city,
-        'labels': labels,
-        'temp_data': temp_data,
-        'daily_labels': daily_labels,
-        'temp_min_data': temp_min_data,
-        'temp_max_data': temp_max_data,
-    })
+    'current_weather': current_weather,
+    'weather_data': weather_data,
+    'daily_summary': sorted(daily_summary.items()),
+    'original_data': original_data,
+    'city': city,
+    'labels': json.dumps(labels),
+    'temp_data': json.dumps(temp_data),
+    'daily_labels': json.dumps(daily_labels),
+    'temp_min_data': json.dumps(temp_min_data),
+    'temp_max_data': json.dumps(temp_max_data),
+})
+
 
 
 def daily_detail_view(request, date):
@@ -87,6 +91,12 @@ def daily_detail_view(request, date):
         'hourly_data': hourly_data,
         'city': city,
     }
+
+    if weather_data:
+        request.session['weather_data'] = weather_data
+    if city:
+        request.session['city'] = city
+
 
     return render(request, 'weather/daily_detail.html', context)
 
@@ -108,7 +118,7 @@ def get_weather_by_coords(request):
         # Step 1: Reverse geocode to get city name
         geo_url = (
             f"http://api.openweathermap.org/geo/1.0/reverse"
-            f"?lat={lat}&lon={lon}&limit=1&appid={OWM_API_KEY}"
+            f"?lat={lat}&lon={lon}&limit=1&appid={OPENWEATHER_API_KEY}"
         )
         geo_resp = requests.get(geo_url)
         geo_resp.raise_for_status()
