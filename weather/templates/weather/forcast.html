@@ -1,170 +1,212 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    {% load static %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-    <title>CloudCast</title>
-    <style>
-      form {
-        margin-bottom: 30px;
-      }
-      .search-wrapper {
-        width: 500px;
-        margin: auto;
-        margin-top: 50px;
-      }
-      form input {
-        padding: 5px;
-        border: 1px solid #ccc;
-        outline: 0;
-        border-radius: 15px;
-      }
-      form button {
-        background: #a3b8cf;
-        padding: 10px;
-        margin-top: 10px;
-        font-size: 18px;
-        font-weight: bold;
-        font-family: 'Garamond', serif;
-        color: #163548e6;
-        box-shadow: rgba(18, 47, 87, 0.696) 0px 4px 12px;
-      }
-    </style>
-  </head>
-  <body style="background: #c5deece6;">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% load static %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>CloudCast</title>
+  <style>
+    form {
+      margin-bottom: 30px;
+    }
+    .search-wrapper {
+      width: 500px;
+      margin: auto;
+      margin-top: 50px;
+    }
+    form input {
+      padding: 5px;
+      border: 1px solid #ccc;
+      outline: 0;
+      border-radius: 15px;
+    }
+    form button {
+      background: #a3b8cf;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      font-family: 'Garamond', serif;
+      color: #163548e6;
+      box-shadow: rgba(18, 47, 87, 0.696) 0px 4px 12px;
+    }
+  </style>
+</head>
+<body style="background: #c5deece6;">
 
-    <!-- Current Weather -->
-    <div id="current" class="wrapper">
-      <form method="POST">
-        {% csrf_token %}
-        <p style="margin-top: -30px; margin-bottom: 20px; font-size: 4rem; font-weight: 900; font-family: 'Garamond', serif; color: #163548;">
-          CloudCast
-        </p>
-        <input type="text" name="city" placeholder="Enter city">
-        <button type="submit">Get Weather</button>
-      </form>
+<div id="current" class="wrapper">
+  <form method="POST">
+    {% csrf_token %}
+    <p style="margin-top: -30px; margin-bottom: 20px; font-size: 4rem; font-weight: 900; font-family: 'Garamond', serif; color: #163548;">
+      CloudCast
+    </p>
+    <input type="text" name="city" placeholder="Enter city">
+    <button type="submit">Get Weather</button>
+  </form>
 
-      {% if current_weather %}
-        <h1 class="location" style="font-size: 2.2rem;">{{ city|title }}</h1>
-        <h2 class="date">{{ current_weather.formatted_date }}</h2>
-        <p class="temp" style="font-size: 2.8rem;">{{ current_weather.main.temp }}°C</p>
-        <img src="http://openweathermap.org/img/wn/{{ current_weather.weather.0.icon }}@2x.png" alt="{{ current_weather.weather.0.description }}">
-        <p class="conditions">{{ current_weather.weather.0.description }}</p>
-      {% else %}
-        <p>Search for the location you would like to check the weather for!</p>
-      {% endif %}
+  {% if current_weather %}
+    <h1 class="location" style="font-size: 2.2rem;">{{ city|title }}</h1>
+    <h2 class="date">{{ current_weather.formatted_date }}</h2>
+    <p class="temp" style="font-size: 2.8rem;">{{ current_weather.main.temp }}°C</p>
+    <img src="http://openweathermap.org/img/wn/{{ current_weather.weather.0.icon }}@2x.png" alt="{{ current_weather.weather.0.description }}">
+    <p class="conditions">{{ current_weather.weather.0.description }}</p>
+  {% else %}
+    <p>Search for the location you would like to check the weather for!</p>
+  {% endif %}
 
-      <!-- Future Forecast -->
-      <div class="container-fluid" style="background-color: #c5deece6; margin-bottom: 30px; margin-top: 30px;">
-        <div class="row">
-          {% if daily_summary %}
-          {% for date, summary in daily_summary %}
-            <div class="col-md-2">
-              <div class="card forecast-card" style="padding: 10px;">
-                <a href="{% url 'alert:daily_detail_view' date %}">
-                  <h6 class="day date" style="font-weight: bold;">{{ summary.date }}</h6>
-                  <div class="mostlycloudy">
-                    <div class="inner">
-                      <img src="http://openweathermap.org/img/wn/{{ summary.icon }}.png" alt="Weather icon">
-                    </div>
-                  </div>
-                  <p class="conditions">{{ summary.weather.0.description }}</p>
-                  <p class="tempRange">
-                    <strong>High:</strong><span class="high">{{ summary.temp_max }}°C</span><br>
-                    <strong>Low:</strong><span class="low">{{ summary.temp_min }}°C</span>
-                  </p>
-                </a>
+  <!-- Forecast Cards -->
+  <div class="container-fluid" style="background-color: #c5deece6; margin-bottom: 30px; margin-top: 30px;">
+    <div class="row">
+      {% if daily_summary %}
+      {% for date, summary in daily_summary %}
+        <div class="col-md-2">
+          <div class="card forecast-card" style="padding: 10px;">
+            <a href="{% url 'alert:daily_detail_view' date %}">
+              <h6 class="day date" style="font-weight: bold;">{{ summary.date }}</h6>
+              <div class="mostlycloudy">
+                <div class="inner">
+                  <img src="http://openweathermap.org/img/wn/{{ summary.icon }}.png" alt="Weather icon">
+                </div>
               </div>
-            </div>
-          {% endfor %}
-          {% endif %}
+              <p class="conditions">{{ summary.weather.0.description }}</p>
+              <p class="tempRange">
+                <strong>High:</strong> <span class="high">{{ summary.temp_max }}°C</span><br>
+                <strong>Low:</strong> <span class="low">{{ summary.temp_min }}°C</span>
+              </p>
+            </a>
+          </div>
         </div>
-      </div>
-
-      {% if daily_summary and original_data %}
-      <!-- Chart.js canvas -->
-      <div class="chart-container">
-        <canvas id="weatherChart"></canvas>
-      </div>
-
-      <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-          var labels = {{ labels|safe }};
-          var tempData = {{ temp_data|safe }};
-          var tempMinData = {{ temp_min_data|safe }};
-          var tempMaxData = {{ temp_max_data|safe }};
-
-          if (labels.length && tempData.length) {
-            var ctx = document.getElementById('weatherChart').getContext('2d');
-            var weatherChart = new Chart(ctx, {
-              type: 'line',
-              data: {
-                labels: labels,
-                datasets: [
-                  {
-                    label: 'Temperature (°C)',
-                    data: tempData,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    fill: false,
-                    tension: 0.1
-                  },
-                  {
-                    label: 'Min Temperature (Daily Summary) (°C)',
-                    data: tempMinData,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: false,
-                    tension: 0.1
-                  },
-                  {
-                    label: 'Max Temperature (Daily Summary) (°C)',
-                    data: tempMaxData,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    fill: false,
-                    tension: 0.1
-                  }
-                ]
-              },
-              options: {
-                responsive: true,
-                scales: {
-                  x: {
-                    type: 'category',
-                    labels: labels,
-                    title: {
-                      display: true,
-                      text: 'Date and Time'
-                    }
-                  },
-                  y: {
-                    beginAtZero: false,
-                    title: {
-                      display: true,
-                      text: 'Temperature (°C)'
-                    }
-                  }
-                }
-              }
-            });
-          }
-        });
-      </script>
+      {% endfor %}
       {% endif %}
     </div>
+  </div>
 
-    <footer>
-      <p style="margin-top: 100px; background-color: #314159;">
-        <a href=""></a>
-      </p>
-    </footer>
+  {% if daily_summary and original_data %}
+  <div class="chart-container">
+    <canvas id="weatherChart"></canvas>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </body>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const labels = {{ labels|safe }};
+      const tempData = {{ temp_data|safe }};
+      const tempMinData = {{ temp_min_data|safe }};
+      const tempMaxData = {{ temp_max_data|safe }};
+
+      if (labels.length && tempData.length) {
+        const ctx = document.getElementById('weatherChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Temperature (°C)',
+                data: tempData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: false,
+                tension: 0.1
+              },
+              {
+                label: 'Min Temperature (Daily Summary) (°C)',
+                data: tempMinData,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: false,
+                tension: 0.1
+              },
+              {
+                label: 'Max Temperature (Daily Summary) (°C)',
+                data: tempMaxData,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: false,
+                tension: 0.1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                type: 'category',
+                title: {
+                  display: true,
+                  text: 'Date and Time'
+                }
+              },
+              y: {
+                beginAtZero: false,
+                title: {
+                  display: true,
+                  text: 'Temperature (°C)'
+                }
+              }
+            }
+          }
+        });
+      }
+    });
+  </script>
+  {% endif %}
+</div>
+
+<!-- Leaflet Map below chart -->
+<div id="map" style="height: 400px; width: 100%; max-width: 800px; margin: 50px auto; border-radius: 12px;"></div>
+
+<!-- Weather Info from Map Click -->
+<div id="mapWeatherResult" style="margin: 20px auto; text-align: center; font-family: 'Garamond', serif; color: #163548; display: none;">
+  <h3 id="clickedLocation" style="font-weight: bold;"></h3>
+  <p id="clickedWeather"></p>
+  <p id="clickedTemp" style="font-size: 1.5rem;"></p>
+</div>
+
+<!-- Leaflet Script -->
+<script>
+  var map = L.map('map').setView([33.7490, -84.3880], 5); // Default to ATL
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  map.on('click', function (e) {
+    const lat = e.latlng.lat;
+    const lon = e.latlng.lng;
+
+    fetch(`/get-weather/?lat=${lat}&lon=${lon}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('mapWeatherResult').style.display = 'block';
+        if (data.error) {
+          document.getElementById('clickedLocation').innerText = 'Weather data not found';
+          document.getElementById('clickedWeather').innerText = '';
+          document.getElementById('clickedTemp').innerText = '';
+        } else {
+          document.getElementById('clickedLocation').innerText = `📍 ${data.city}`;
+          document.getElementById('clickedWeather').innerText = `🌤️ ${data.description}`;
+          document.getElementById('clickedTemp').innerText = `🌡️ ${data.temp}°F`;
+        }
+      })
+      .catch(err => {
+        document.getElementById('mapWeatherResult').style.display = 'block';
+        document.getElementById('clickedLocation').innerText = 'Error fetching weather data';
+        document.getElementById('clickedWeather').innerText = '';
+        document.getElementById('clickedTemp').innerText = '';
+        console.error(err);
+      });
+  });
+</script>
+
+<footer>
+  <p style="margin-top: 100px; background-color: #314159;"><a href=""></a></p>
+</footer>
+
+</body>
 </html>
