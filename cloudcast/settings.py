@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['cloudcast-app-fyftcxergtbxekff.eastus-01.azurewebsites.net']
 
+CSRF_TRUSTED_ORIGINS = ['https://cloudcast-app-fyftcxergtbxekff.eastus-01.azurewebsites.net/']
+
 # Application definition
 
 INSTALLED_APPS = [
