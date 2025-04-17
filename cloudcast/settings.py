@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-ef_y&1m74vmp+*$+j-s@+to@8=0txnl@$r-o%i2$tbax)2^ckn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['cloudcast-app-fyftcxergtbxekff.eastus-01.azurewebsites.net']
 
 # Application definition
 
