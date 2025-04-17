@@ -1,0 +1,284 @@
+/*----------------
+	General
+-----------------*/
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+:focus {
+	outline: none;
+}
+
+html, body {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	color: #163548e6;
+	font-family: 'Garamond', serif;
+	font-weight: 300;
+	position: relative;
+	letter-spacing: 0.05rem;
+	line-height: 1.5;
+	text-align: center;
+}
+
+a {
+	color: #000;
+	font-weight: 700;
+	text-decoration: none !important;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+footer {
+	color: rgba(255,255,255,0.6);
+	font-size: 0.8rem;
+	letter-spacing: 0.07em;
+	line-height: 2;
+	padding: 30px 0;
+	width: 100%;
+}
+
+#lastUpdated {
+	color: #000;
+	padding: 5% 0;
+}
+
+#lastUpdated:before { content: '-- '; }
+#lastUpdated:after { content: ' --'; }
+
+/*----------------
+	Containers
+-----------------*/
+.wrapper {
+	color: #000;
+	overflow: auto;
+	width: 100%;
+}
+
+/*----------------
+	Status Bar
+-----------------*/
+#status {
+	background-color: #88becb;
+	color: rgba(0,0,0,0.5);
+	display: none;
+	font-size: 1rem;
+	width: 100%;
+	z-index: 100;
+}
+
+#status p {
+	display: inline-block;
+	padding: 10px 40px 6px;
+}
+
+#status a {
+	color: #000;
+}
+
+#status .close {
+	background: none;
+	color: rgba(0,0,0,0.5);
+	float: right;
+	height: 40px;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 40px;
+}
+
+#status.error {
+	background-color: #EE9797;
+	color: #000;
+}
+
+#status.success {
+	background-color: #82C886;
+	color: #000;
+}
+
+/*----------------
+	Buttons
+-----------------*/
+button {
+	border: none;
+	cursor: pointer;
+}
+
+nav {
+	font-size: 1rem;
+	margin: 0 auto;
+	padding: 5% 0 10%;
+}
+
+#locateBtn, #unitBtn {
+	background: none;
+	border: 1px solid rgba(255,255,255,0.25);
+	border-radius: 50%;
+	color: #000;
+	height: 40px;
+	transition: background 1s ease-in-out, border 0.2s ease-in-out;
+	width: 40px;
+}
+
+#locateBtn.on, #unitBtn.on {
+	background: rgba(255,255,255,0.25);
+}
+
+#locateBtn:focus, #locateBtn:hover,
+#unitBtn:focus, #unitBtn:hover {
+	border: 1px solid rgba(255,255,255,0.75);
+}
+
+#locateBtn {
+	margin-right: 10px;
+}
+
+#unitBtn {
+	font-weight: 300;
+	padding-right: 3px;
+	padding-top: 2px;
+	text-transform: uppercase;
+}
+
+#unitBtn:before {
+	content: '\00b0';
+	padding: 1px;
+}
+
+/* locateBtn Pulse Animation */
+#locateBtn.pulse {
+	animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+	20% { background: rgba(255,255,255,0.25); }
+}
+
+/*----------------
+	Current Weather
+-----------------*/
+#current {
+	padding: 10% 5% 20%;
+	position: relative;
+}
+
+.location {
+	font-size: 2em;
+	font-weight: 700;
+	margin: 0;
+}
+
+.date {
+	font-size: 1em;
+	font-weight: 300;
+	text-transform: uppercase;
+}
+
+.temp {
+	font-size: 3em;
+	line-height: 1.3;
+}
+
+.temp:after {
+	content: '\00b0';
+	margin-right: -0.3em;
+}
+
+#current .conditions {
+	font-size: 1.2em;
+	text-transform: uppercase;
+}
+
+/*----------------
+	Forecast Cards
+-----------------*/
+#future {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 20px;
+	padding: 0 10%;
+	margin-bottom: 10%;
+}
+
+.forecast-card {
+	width: 160px;
+	height: 230px;
+	background: white;
+	border-radius: 10px;
+	padding: 20px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	text-align: center;
+	overflow: hidden;
+	margin: 0 auto;
+}
+
+.forecast-date {
+	font-size: 1rem;
+	font-weight: 700;
+	line-height: 1.3;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.tempRange {
+	font-size: 1.05rem;
+	line-height: 1.6;
+	color: #163548e6;
+    font-weight: 500;
+}
+
+
+.high:after, .low:after {
+	content: '\00b0';
+	padding: 1px;
+}
+
+/*----------------
+	Media Queries
+-----------------*/
+@media (min-width: 550px) {
+	.forecast-card {
+		width: 180px;
+		height: 250px;
+	}
+	#current {
+		font-size: 1.3rem;
+		padding-top: 10%;
+		padding-bottom: 10%;
+	}
+	.date, #current .conditions {
+		font-size: 0.9em;
+	}
+	#current .weatherIcon {
+		height: 120px;
+		width: 120px;
+		margin: 7% auto 3%;
+	}
+}
+
+@media (min-width: 880px) {
+	#current {
+		font-size: 1.5rem;
+		padding-top: 7%;
+		padding-bottom: 7%;
+	}
+	#current .weatherIcon {
+		margin: 5% auto 2%;
+	}
+	#lastUpdated {
+		padding: 3%;
+	}
+}
