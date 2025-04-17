@@ -23,12 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ef_y&1m74vmp+*$+j-s@+to@8=0txnl@$r-o%i2$tbax)2^ckn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['cloudcast-app-fyftcxergtbxekff.eastus-01.azurewebsites.net']
-
-CSRF_TRUSTED_ORIGINS = ['https://cloudcast-app-fyftcxergtbxekff.eastus-01.azurewebsites.net/']
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://cloudcast-app-fyftcxergtbxekff.eastus-01.azurewebsites.net',
+    'https://cloudcast-app-fyftcxergtbxekff.azurewebsites.net',  # no region
+]
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = [
